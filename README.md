@@ -1,10 +1,6 @@
  <p align="center"><img src="./images/OCR-logo.png" alt="Logo" width="100"></p>
  <h1 align="center">Invoice OCR App</h1>
 
-<p align="center">
-  <img src="https://img.shields.io/github/stars/MatKollar/Invoice_OCR_app?style=social" alt="GitHub Repo stars"/>
-</p>
-
 Web application for recognizing and managing data from Slovak invoices.
 
 ## 📚 Table of Contents
@@ -52,7 +48,7 @@ Here are the steps to get this application up and running:
 
 1. **Clone the repository**
     ```
-    git clone https://github.com/MatKollar/Invoice_OCR_app.git
+    git clone https://github.com/izzykle/Invoice_OCR_app.git
     ```
 2. **Navigate into the project directory**
     ```
@@ -77,3 +73,6 @@ Here are the steps to get this application up and running:
 * Implementation of NER (Named Entity Recognition) for data extraction
 * Support more language models
 * Data extraction support for international invoices
+
+## 🙏 Credits
+This project is based on the original work by [MatKollar](https://github.com/MatKollar/Invoice_OCR_app).
