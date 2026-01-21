@@ -24,23 +24,38 @@ const DoughnutChart = ({ handleCloseChart, invoice_id }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!invoice_id) {
+          console.warn("No invoice ID provided");
+          enqueueSnackbar("No invoice data available", { variant: "warning" });
+          return;
+        }
+
         const resp = await httpRequest.post(
           `${process.env.REACT_APP_BACKEND_URL}/get-performance-data`,
           {
             invoice_id: invoice_id,
           },
         );
-        setRecognition(resp.data.recognition_time);
-        setParsing(resp.data.parsing_time);
-        setOther(resp.data.other_time);
-        setScore(resp.data.average_confidence);
-        setOcrMethod(resp.data.ocr_method);
+
+        if (resp.data && resp.data.recognition_time) {
+          setRecognition(resp.data.recognition_time);
+          setParsing(resp.data.parsing_time);
+          setOther(resp.data.other_time);
+          setScore(resp.data.average_confidence);
+          setOcrMethod(resp.data.ocr_method);
+        } else {
+          console.warn("Invalid performance data format:", resp.data);
+          enqueueSnackbar("Invalid performance data received", { variant: "warning" });
+        }
       } catch (error) {
-        console.log("Error");
-        enqueueSnackbar("Error fetching performance data", { variant: "error" });
+        console.error("Error fetching performance data:", error);
+        enqueueSnackbar("Error fetching performance data. Try reloading the page.", { variant: "error" });
       }
     };
-    fetchData();
+
+    if (invoice_id) {
+      fetchData();
+    }
   }, [invoice_id, enqueueSnackbar]);
 
   let data = "";

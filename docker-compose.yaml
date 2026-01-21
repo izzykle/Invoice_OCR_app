@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   postgres:
     image: 'postgres'
@@ -12,7 +11,7 @@ services:
   backend:
     build: ./backend
     ports:
-      - '5000:5000'
+      - '5001:5000'   # Using port 5001 since 5000 is in use
     volumes:
         - ./backend:/app
     depends_on: 

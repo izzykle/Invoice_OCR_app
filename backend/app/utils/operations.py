@@ -99,6 +99,70 @@ def add_invoice_to_db(parsed_data, text, pdf_file, img_file, average_confidence,
 
 
 def check_if_invoice(parsed_data):
-    required_fields = ['invoice_number', 'var_symbol', 'total_price',
-                       'due_date', 'iban', 'buyer_ico', 'supplier_ico', "bank"]
-    return any(parsed_data.get(field) for field in required_fields)
+    """
+    Check if the parsed data is likely from an invoice using a scoring system.
+    Returns True if the document is likely an invoice, False otherwise.
+    """
+    print("Parsed Data:", parsed_data)
+
+    score = 0
+    
+    # Critical fields that strongly indicate an invoice
+    critical_fields = {
+        'invoice_number': 3,  # Invoice number is a strong indicator
+        'total_price': 3,    # Total price is a strong indicator
+        'iban': 2,           # IBAN is a good indicator
+    }
+    
+    # Supporting fields that add confidence
+    supporting_fields = {
+        'var_symbol': 1,
+        'due_date': 1,
+        'date_of_issue': 1,
+        'buyer_ico': 1,
+        'supplier_ico': 1,
+        'bank': 1,
+        'swift': 1
+    }
+    
+    # Check critical fields
+    for field, weight in critical_fields.items():
+        if parsed_data.get(field):
+            score += weight
+            print(f"+{weight} for {field}")
+            
+    # Check supporting fields
+    for field, weight in supporting_fields.items():
+        if parsed_data.get(field):
+            score += weight
+            print(f"+{weight} for {field}")
+            
+    # Check supplier and buyer data if present
+    if parsed_data.get('supplier_data'):
+        supplier_data = parsed_data['supplier_data']
+        if supplier_data.get('ICO'):
+            score += 1
+            print("+1 for supplier ICO")
+        if supplier_data.get('DIC'):
+            score += 1
+            print("+1 for supplier DIC")
+        if supplier_data.get('Name'):
+            score += 0.5
+            print("+0.5 for supplier Name")
+        
+    if parsed_data.get('buyer_data'):
+        buyer_data = parsed_data['buyer_data']
+        if buyer_data.get('ICO'):
+            score += 1
+            print("+1 for buyer ICO")
+        if buyer_data.get('DIC'):
+            score += 1
+            print("+1 for buyer DIC")
+        if buyer_data.get('Name'):
+            score += 0.5
+            print("+0.5 for buyer Name")
+        
+    print("Final Score:", score)
+
+    # Consider it an invoice if score is 4 or higher (lowered from 5)
+    return score >= 4

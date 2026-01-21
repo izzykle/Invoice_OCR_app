@@ -4,7 +4,7 @@ import os
 load_dotenv()
 
 INVOICE_LANG = "slk"
-BACKEND_URL = "http://localhost:5000"
+BACKEND_URL = "http://localhost:5001"
 
 
 class ApplicationConfig:
@@ -13,4 +13,4 @@ class ApplicationConfig:
     SQLALCHEMY_ECHO = True
     SQLALCHEMY_DATABASE_URI = os.environ["SQLALCHEMY_DATABASE_URI"]
     SESSION_TYPE = "sqlalchemy"
-    SESSION_PERMEMNAT = True
+    SESSION_PERMANENT = True

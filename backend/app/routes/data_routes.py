@@ -51,9 +51,21 @@ def save_time_other_route():
 
 @getData_bp.route('/get-performance-data', methods=['POST'])
 def get_performance_data_route():
-    invoice_id = request.json['invoice_id']
-    performance_data = get_performance_data(invoice_id)
-    if performance_data:
-        return jsonify(performance_data)
-    else:
-        return jsonify({'error': 'No performance data found for the given invoice_id.'}), 404
+    try:
+        if not request.is_json:
+            return jsonify({'error': 'Missing JSON in request'}), 400
+            
+        data = request.get_json()
+        if not data or 'invoice_id' not in data:
+            return jsonify({'error': 'Missing invoice_id parameter'}), 400
+            
+        invoice_id = data['invoice_id']
+        performance_data = get_performance_data(invoice_id)
+        
+        if performance_data:
+            return jsonify(performance_data)
+        else:
+            return jsonify({'error': 'No performance data found for the given invoice_id'}), 404
+    except Exception as e:
+        print(f"Error in get_performance_data_route: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500

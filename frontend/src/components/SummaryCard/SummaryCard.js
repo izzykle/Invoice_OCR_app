@@ -194,19 +194,35 @@ const SummaryCard = (props) => {
 
   const handleSave = async () => {
     try {
-      await httpRequest.post(
+      if (!newData || Object.keys(newData).length === 0) {
+        enqueueSnackbar("No changes to save", { variant: "warning" });
+        return;
+      }
+      
+      const response = await httpRequest.post(
         `${process.env.REACT_APP_BACKEND_URL}/update-invoice`,
         {
           new_data: newData,
         }
       );
-      if (props && Object.keys(props).length > 0) {
-        props.dataChanged();
+      
+      if (response && response.data) {
+        if (props && Object.keys(props).length > 0 && props.dataChanged) {
+          props.dataChanged();
+        }
+        enqueueSnackbar("Data saved successfully", { variant: "success" });
+      } else {
+        throw new Error("Invalid response from server");
       }
-      enqueueSnackbar("Data saved successfully", { variant: "success" });
     } catch (error) {
       console.error("Error in saving data:", error);
-      enqueueSnackbar("Error in saving data", { variant: "error" });
+      let errorMessage = "Error saving data. Please try again.";
+      
+      if (error.response && error.response.data && error.response.data.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      enqueueSnackbar(errorMessage, { variant: "error" });
     }
 
     setDataChanged(false);
@@ -346,11 +362,38 @@ const SummaryCard = (props) => {
                 <Grid item xs={5}>
                   <Paper
                     elevation={3}
-                    sx={{ mt: 15, p: 10, borderRadius: 5, height: 200 }}
+                    sx={{ mt: 15, p: 4, borderRadius: 5, minHeight: 200 }}
                   >
-                    <h4 style={{ textAlign: "center", marginTop: "-15px" }}>
-                      The recognized document is probably not an invoice!
+                    <h4 style={{ textAlign: "center", marginTop: "5px", color: "#F44336" }}>
+                      This document might not be an invoice
                     </h4>
+                    <p style={{ textAlign: "center", marginTop: "15px" }}>
+                      The OCR engine couldn't detect enough invoice-related fields.
+                    </p>
+                    <p style={{ textAlign: "center", marginTop: "10px" }}>
+                      If this is an invoice, you can manually extract the data.
+                    </p>
+                    <div style={{ display: "flex", justifyContent: "center", marginTop: "20px", gap: "15px" }}>
+                      <ButtonContained
+                        variant="contained"
+                        onClick={() => {
+                          setIsInvoice(true);
+                          ocrCtx.setIsInvoice(true);
+                        }}
+                        style={{ padding: "7px 22px" }}
+                      >
+                        PROCESS AS INVOICE
+                      </ButtonContained>
+                      <ButtonContained
+                        variant="contained"
+                        onClick={() => {
+                          ocrCtx.setActivePage(1); // Go back to upload page
+                        }}
+                        style={{ padding: "7px 22px", backgroundColor: "#9e9e9e" }}
+                      >
+                        TRY ANOTHER DOCUMENT
+                      </ButtonContained>
+                    </div>
                   </Paper>
                 </Grid>
               )}

@@ -16,7 +16,9 @@ def create_app():
     app.config['SESSION_SQLALCHEMY'] = db
     app.config['CORS_HEADERS'] = 'Content-Type'
 
-    CORS(app, supports_credentials=True)
+    # Standard configuration of CORS that is known to work
+    CORS(app, resources={r"/*": {"origins": "http://localhost:3000", "supports_credentials": True}})
+    
     Session(app)
     db.init_app(app)
     bcrypt.init_app(app)

@@ -69,9 +69,25 @@ def save_time_other(invoice_id, time_other):
 
 
 def get_performance_data(invoice_id):
-    invoice = Invoice.query.get(invoice_id)
-    performance = invoice.performance
-    if performance:
+    try:
+        # Check if invoice_id is valid
+        if not invoice_id:
+            return None
+            
+        # Convert to int if it's a string
+        if isinstance(invoice_id, str) and invoice_id.isdigit():
+            invoice_id = int(invoice_id)
+            
+        invoice = Invoice.query.get(invoice_id)
+        if not invoice:
+            print(f"No invoice found with ID: {invoice_id}")
+            return None
+            
+        performance = invoice.performance
+        if not performance:
+            print(f"No performance data found for invoice ID: {invoice_id}")
+            return None
+            
         return {
             'average_confidence': performance.average_confidence,
             'recognition_time': performance.recognition_time,
@@ -79,4 +95,6 @@ def get_performance_data(invoice_id):
             'other_time': performance.other_time,
             'ocr_method': performance.ocr_method
         }
-    return None
+    except Exception as e:
+        print(f"Error getting performance data: {str(e)}")
+        return None
